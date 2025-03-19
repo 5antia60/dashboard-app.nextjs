@@ -10,7 +10,7 @@ export default async function InvoicesTable({
 }: {
   query: string;
   currentPage: number;
-}) {
+}): Promise<React.ReactNode> {
   const invoices = await fetchFilteredInvoices(query, currentPage);
 
   return (
