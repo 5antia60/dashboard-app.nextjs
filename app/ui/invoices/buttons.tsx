@@ -25,7 +25,7 @@ export function UpdateInvoice({ id }: { id: string }): React.ReactNode {
   );
 }
 
-export function DeleteInvoice({ id }: { id: string }) {
+export function DeleteInvoice({ id }: { id: string }): React.ReactNode {
   const deleteInvoiceWithId = deleteInvoice.bind(null, id);
 
   return (
