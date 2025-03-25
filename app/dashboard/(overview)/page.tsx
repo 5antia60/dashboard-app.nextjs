@@ -5,10 +5,10 @@ import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import CardWrapper from '@/app/ui/dashboard/cards';
 
-export default async function Page() {
+export default async function DashboardPage() {
   return (
     <main>
-      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`} data-testid="dashboard-title">
         Dashboard
       </h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
