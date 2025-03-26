@@ -2,6 +2,7 @@ import postgres from 'postgres';
 import {
   CustomerField,
   CustomersTableType,
+  FormattedCustomersTable,
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
@@ -181,6 +182,54 @@ export async function fetchCustomers() {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all customers.');
+  }
+}
+
+export async function fetchFormattedCustomersTable(
+  searchParam: string = '',
+  currentPage: number,
+): Promise<FormattedCustomersTable[]> {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const customers = await sql<FormattedCustomersTable[]>`
+      SELECT
+        c.id,
+        c.name,
+        c.email,
+        c.image_url,
+        count(i.id) AS "total_invoices",
+        count(CASE WHEN i.status = 'pending' THEN i.id END) AS "total_pending",
+        count(CASE WHEN i.status = 'paid' THEN i.id END) AS "total_paid"
+      FROM customers c
+      LEFT JOIN invoices i ON i.customer_id = c.id
+      WHERE c.name ILIKE ${`%${searchParam}%`} OR c.email ILIKE ${`%${searchParam}%`}
+      GROUP BY c.id
+      ORDER BY c.name ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return customers;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all customers.');
+  }
+}
+
+export async function fetchCustomersPages(searchParam: string): Promise<number> {
+  try {
+    const data = await sql`SELECT COUNT(*)
+    FROM customers c
+    WHERE
+      c.name ILIKE ${`%${searchParam}%`} OR
+      c.email ILIKE ${`%${searchParam}%`}
+  `;
+
+    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of invoices.');
   }
 }
 
